@@ -2,36 +2,38 @@ import flatpickr from 'flatpickr';
 // Дополнительный импорт стилей
 import 'flatpickr/dist/flatpickr.min.css';
 
-const start = Date.now();
+const startBtn = document.querySelector('button[data-start]');
+startBtn.disabled = true;
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  onClose(selectedDates, dateStr, instance) {
-    const date = new Date(selectedDates).getTime();
-    if(date > start){
-      startBtn.disabled = false;
-      const dateone = date-start;
-      console.log(dateone)
-      console.log(convertMs(dateone))
-
-    }
-
-     
-    
-  },
+  onClose: [
+    function (selectedDates) {
+      this.defaultDate = selectedDates;
+      // const currentDate = Date.now();
+      // const selectedDate = new Date(selectedDates).getTime();
+      // if (selectedDate < currentDate) {
+      //   return;
+      // }
+      // startBtn.disabled = false;
+      // let timeRemaining = selectedDate - currentDate;
+      // setInterval(() => {
+      //   timeRemaining -= 1000;
+      //   console.log(convertMs(timeRemaining));
+      //   console.log(timeRemaining);
+      // }, 1000);
+      // console.log(timeRemaining);
+      // convertMs(timeRemaining);
+    },
+  ],
 };
-
-const startBtn = document.querySelector('button[data-start]');
-startBtn.disabled = true;
 
 flatpickr('#datetime-picker', options);
 
-
-
-console.log(start)
+function checkSelectedDate(selectedDates) {}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time

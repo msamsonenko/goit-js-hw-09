@@ -4,53 +4,50 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const startBtn = document.querySelector('button[data-start]');
 startBtn.disabled = true;
-startBtn.addEventListener('click', onStartBtnClick);
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  onClose: [],
-  
+  onClose(selectedDates) {
+    const currentDate = Date.now();
+    const selectedDate = new Date(selectedDates);
+
+    this.defaultDate = selectedDate;
+    console.log(selectedDate);
+    getSelect(selectedDate.getTime() - currentDate);
+    if (selectedDate.getTime() < currentDate) {
+      alert('choose a valid date in the future');
+      return;
+    }
+    startBtn.disabled = false;
+    startBtn.addEventListener('click', () => {
+      const currentDate = Date.now();
+
+      let timeRemaining = selectedDate.getTime() - currentDate;
+
+      const timerId = setInterval(() => {
+        if (timeRemaining < 1000) {
+          alert('the end');
+          clearInterval(timerId);
+          return;
+        }
+        timeRemaining -= 1000;
+        console.log(convertMs(timeRemaining));
+      }, 1000);
+      convertMs(timeRemaining);
+    });
+  },
 };
 
 const instance = flatpickr('#datetime-picker', options);
 
-console.log(options)
-console.log(instance)
-function closeCalendar(selectedDates) {
+console.log(instance.config);
 
-  const currentDate = Date.now();
-  const selectedDate = new Date(selectedDates);
-  this.defaultDate = selectedDate;
-
-
-  console.log(currentDate);
-  console.log(selectedDate)
-  console.log(this)
-  if (selectedDate.getTime() < currentDate) {
-    alert('choose a valid date in the future')
-    return;
-  }
-  startBtn.disabled = false;
- 
-}
-instance.config.onClose.push(closeCalendar)
-
-function onStartBtnClick() {
-  const currentDate = Date.now();
-const pickedDate = instance.config.defaultDate.getTime();
-
-  let timeRemaining =  pickedDate - currentDate;
-  setInterval(() => {
-      timeRemaining -= 1000;
-      console.log(convertMs(timeRemaining));
-      console.log(timeRemaining);
-    }, 1000);
-    console.log(timeRemaining);
-    convertMs(timeRemaining);
-
+function getSelect(ms) {
+  convertMs(ms);
+  console.log(convertMs(ms));
 }
 
 function convertMs(ms) {

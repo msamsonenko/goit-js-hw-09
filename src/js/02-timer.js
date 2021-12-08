@@ -4,36 +4,54 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const startBtn = document.querySelector('button[data-start]');
 startBtn.disabled = true;
+startBtn.addEventListener('click', onStartBtnClick);
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  onClose: [
-    function (selectedDates) {
-      this.defaultDate = selectedDates;
-      // const currentDate = Date.now();
-      // const selectedDate = new Date(selectedDates).getTime();
-      // if (selectedDate < currentDate) {
-      //   return;
-      // }
-      // startBtn.disabled = false;
-      // let timeRemaining = selectedDate - currentDate;
-      // setInterval(() => {
-      //   timeRemaining -= 1000;
-      //   console.log(convertMs(timeRemaining));
-      //   console.log(timeRemaining);
-      // }, 1000);
-      // console.log(timeRemaining);
-      // convertMs(timeRemaining);
-    },
-  ],
+  onClose: [],
+  
 };
 
-flatpickr('#datetime-picker', options);
+const instance = flatpickr('#datetime-picker', options);
 
-function checkSelectedDate(selectedDates) {}
+console.log(options)
+console.log(instance)
+function closeCalendar(selectedDates) {
+
+  const currentDate = Date.now();
+  const selectedDate = new Date(selectedDates);
+  this.defaultDate = selectedDate;
+
+
+  console.log(currentDate);
+  console.log(selectedDate)
+  console.log(this)
+  if (selectedDate.getTime() < currentDate) {
+    alert('choose a valid date in the future')
+    return;
+  }
+  startBtn.disabled = false;
+ 
+}
+instance.config.onClose.push(closeCalendar)
+
+function onStartBtnClick() {
+  const currentDate = Date.now();
+const pickedDate = instance.config.defaultDate.getTime();
+
+  let timeRemaining =  pickedDate - currentDate;
+  setInterval(() => {
+      timeRemaining -= 1000;
+      console.log(convertMs(timeRemaining));
+      console.log(timeRemaining);
+    }, 1000);
+    console.log(timeRemaining);
+    convertMs(timeRemaining);
+
+}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time

@@ -2,8 +2,15 @@ import flatpickr from 'flatpickr';
 // Дополнительный импорт стилей
 import 'flatpickr/dist/flatpickr.min.css';
 
+import { timer } from './02-timer-interface';
+const { days: daysElem, hours: hoursElem, minutes: minutesElem, seconds: secondsElem } = timer;
+
 const startBtn = document.querySelector('button[data-start]');
 startBtn.disabled = true;
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
 
 const options = {
   enableTime: true,
@@ -15,7 +22,6 @@ const options = {
     const selectedDate = new Date(selectedDates);
 
     this.defaultDate = selectedDate;
-    console.log(selectedDate);
     getSelect(selectedDate.getTime() - currentDate);
     if (selectedDate.getTime() < currentDate) {
       alert('choose a valid date in the future');
@@ -34,20 +40,21 @@ const options = {
           return;
         }
         timeRemaining -= 1000;
-        console.log(convertMs(timeRemaining));
+        const { days, hours, minutes, seconds } = convertMs(timeRemaining);
+
+        daysElem.textContent = addLeadingZero(days);
+        hoursElem.textContent = addLeadingZero(hours);
+        minutesElem.textContent = addLeadingZero(minutes);
+        secondsElem.textContent = addLeadingZero(seconds);
       }, 1000);
-      convertMs(timeRemaining);
     });
   },
 };
 
 const instance = flatpickr('#datetime-picker', options);
 
-console.log(instance.config);
-
 function getSelect(ms) {
-  convertMs(ms);
-  console.log(convertMs(ms));
+  const convertedObj = convertMs(ms);
 }
 
 function convertMs(ms) {

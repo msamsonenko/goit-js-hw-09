@@ -1,47 +1,55 @@
 import flatpickr from 'flatpickr';
 // Дополнительный импорт стилей
 import 'flatpickr/dist/flatpickr.min.css';
+//function for converting UTC time to user readable time
+import {convertMs} from './02-timer/02-convert-ms';
+//object with DOM elements displaying timer
+import { timerElements } from './02-timer/02-timer-elements';
+const { days: daysElem, hours: hoursElem, minutes: minutesElem, seconds: secondsElem, startBtn } = timerElements;
 
-import { timer } from './02-timer-interface';
-const { days: daysElem, hours: hoursElem, minutes: minutesElem, seconds: secondsElem } = timer;
+import Notiflix from 'notiflix';
 
-const startBtn = document.querySelector('button[data-start]');
+//disabling start button on page load
 startBtn.disabled = true;
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
-}
-
+//flatpickr options
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
+    //get current date
     const currentDate = Date.now();
+    //get selected date
     const selectedDate = new Date(selectedDates);
-
+    //sets input display date to salected date
     this.defaultDate = selectedDate;
-    getSelect(selectedDate.getTime() - currentDate);
+    //checks if the selected date is in the future
     if (selectedDate.getTime() < currentDate) {
-      alert('choose a valid date in the future');
+      Notiflix.Notify.failure('Choose a valid date in the future');
       return;
     }
+    //enabling start button
     startBtn.disabled = false;
+    //add event listener to the start btn
     startBtn.addEventListener('click', () => {
+      //on click get current date
       const currentDate = Date.now();
-
+      // calculate time left to selected date
       let timeRemaining = selectedDate.getTime() - currentDate;
-
+      //timer satrt, called every second
       const timerId = setInterval(() => {
+        //stops timer if remaining time is less then a second
         if (timeRemaining < 1000) {
-          alert('the end');
+          Notiflix.Notify.success('Congrats! Countdown coplete.');
           clearInterval(timerId);
           return;
         }
+        //decrements remaining time by second
         timeRemaining -= 1000;
+        //convert remaining time to user readable time
         const { days, hours, minutes, seconds } = convertMs(timeRemaining);
-
+        //displays timer on page
         daysElem.textContent = addLeadingZero(days);
         hoursElem.textContent = addLeadingZero(hours);
         minutesElem.textContent = addLeadingZero(minutes);
@@ -50,28 +58,12 @@ const options = {
     });
   },
 };
-
+//create instance of flatpicker
 const instance = flatpickr('#datetime-picker', options);
-
-function getSelect(ms) {
-  const convertedObj = convertMs(ms);
+//adds leading zero to timer elements, for user friendly display
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
 }
 
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
 
-  // Remaining days
-  const days = Math.floor(ms / day);
-  // Remaining hours
-  const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
-  return { days, hours, minutes, seconds };
-}

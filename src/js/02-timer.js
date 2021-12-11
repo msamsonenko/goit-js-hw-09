@@ -2,10 +2,16 @@ import flatpickr from 'flatpickr';
 // Дополнительный импорт стилей
 import 'flatpickr/dist/flatpickr.min.css';
 //function for converting UTC time to user readable time
-import {convertMs} from './02-timer/02-convert-ms';
+import { convertMs } from './02-timer/02-convert-ms';
 //object with DOM elements displaying timer
 import { timerElements } from './02-timer/02-timer-elements';
-const { days: daysElem, hours: hoursElem, minutes: minutesElem, seconds: secondsElem, startBtn } = timerElements;
+const {
+  days: daysElem,
+  hours: hoursElem,
+  minutes: minutesElem,
+  seconds: secondsElem,
+  startBtn,
+} = timerElements;
 
 import Notiflix from 'notiflix';
 
@@ -59,11 +65,8 @@ const options = {
   },
 };
 //create instance of flatpicker
-const instance = flatpickr('#datetime-picker', options);
+flatpickr('#datetime-picker', options);
 //adds leading zero to timer elements, for user friendly display
 function addLeadingZero(value) {
   return String(value).padStart(2, '0');
 }
-
-
-

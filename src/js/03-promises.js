@@ -1,36 +1,46 @@
+import Notiflix from 'notiflix';
+//get form element
 const form = document.querySelector('.form');
-
+//an object for storing form input values
 const userInput = {};
+//variable for storing promise number
 let promiseCounter = 0;
+//add event listeners to form element
 form.addEventListener('input', handleUserInput);
 form.addEventListener('submit', handleFormSubmit);
-
+//get user input values and store them in userInput object
+function handleUserInput(e) {
+  userInput[e.target.name] = Number(e.target.value);
+}
+//handle form submit
 function handleFormSubmit(e) {
   e.preventDefault();
-  console.log(userInput.delay);
-  console.log(userInput.step);
-  console.log(`Promise will be called ${userInput.amount} times`);
-  createPromise(2, 1500)
-    .then(({ position, delay }) => {
-      console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-    })
-    .catch(({ position, delay }) => {
-      console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-    });
+  let step = userInput.delay;
+  //create promises according to amount value
+  for (let i = 0; i < userInput.amount; i += 1) {
+    promiseCounter += 1;
+    createPromise(promiseCounter, step).then(onSuccess).catch(onError);
+    step += userInput.step;
+  }
 }
-
-function handleUserInput(e) {
-  userInput[e.target.name] = e.target.value;
+//callback function if promise fulfilled
+function onSuccess({ position, delay }) {
+  Notiflix.Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
 }
+//callback function if promise rejected
+function onError({ position, delay }) {
+  Notiflix.Notify.failure(`Rejected promise ${position} in ${delay}ms`);
+}
+//create promise
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
-
   return new Promise((resolve, reject) => {
-    position = promiseCounter + 1;
-    if (shouldResolve) {
-      resolve(`✅ Fulfilled promise ${position} in ${delay}ms`);
-    } else {
-      reject(`❌ Rejected promise ${position} in ${delay}ms`);
-    }
+    setTimeout(() => {
+      if (shouldResolve) {
+        resolve({ position, delay });
+      } else {
+        reject({ position, delay });
+      }
+    }, delay);
   });
 }
